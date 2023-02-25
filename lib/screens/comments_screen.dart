@@ -95,13 +95,14 @@ class _CommentScreenState extends State<CommentScreen> {
                   });
                 },
                 child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                    child: const Text(
-                      "Post",
-                      style: TextStyle(color: blueColor),
-                    )),
-              )
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                  child: const Text(
+                    "Post",
+                    style: TextStyle(color: blueColor),
+                  ),
+                ),
+              ),
             ],
           ),
         ),

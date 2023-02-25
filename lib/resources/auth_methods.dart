@@ -10,9 +10,9 @@ class AuthMethods {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<model.User> getUserDetails() async {
-    User currentUser = _auth.currentUser!;
+    User? currentUser = _auth.currentUser;
     DocumentSnapshot snap =
-        await _firestore.collection('users').doc(currentUser.uid).get();
+        await _firestore.collection('users').doc(currentUser?.uid).get();
     return model.User.fromSnap(snap);
   }
 
@@ -69,11 +69,17 @@ class AuthMethods {
     String res = "Some error occurred";
     try {
       if (email.isNotEmpty || password.isNotEmpty) {
+        print("Email $email");
+        print("Password $password");
         _auth.signInWithEmailAndPassword(email: email, password: password);
         res = "success";
+        print(
+          FirebaseAuth.instance.currentUser!.uid,
+        );
       }
     } catch (err) {
       res = err.toString();
+      print("LoginUser Err  " + err.toString());
     }
     return res;
   }

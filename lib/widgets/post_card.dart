@@ -47,10 +47,9 @@ class _PostCardState extends State<PostCard> {
   @override
   Widget build(BuildContext context) {
     final User user = Provider.of<UserProvider>(context).getUser;
-
     return Container(
       color: mobileBackgroundColor,
-      padding: EdgeInsets.symmetric(horizontal: 10),
+      padding: EdgeInsets.symmetric(horizontal: 0),
       child: Column(children: [
         Container(
           padding: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
@@ -133,7 +132,7 @@ class _PostCardState extends State<PostCard> {
                 child: LikeAnimation(
                   child: const Icon(
                     Icons.favorite,
-                    color: Colors.white,
+                    color: Colors.red,
                     size: 120,
                   ),
                   isAnimation: islikeAnimating,

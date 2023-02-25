@@ -37,20 +37,27 @@ class _LoginScreenState extends State<LoginScreen> {
     String res = await AuthMethods().loginUser(
         email: _emailControllor.text, password: _passwordControllor.text);
 
-    if (res == "success") {
+    print(res);
+    if (res == 'success') {
+      // Navigator.of(context).push(
+      //   MaterialPageRoute(
+      //     builder: (context) => const responsiveLayout(
+      //       MobileScreenLayout: MobileScreenLayout(),
+      //       WebScreenLayout: WebScreenLayout(),
+      //     ),
+      //   ),
+      // );
+      Navigator.of(context).pushReplacementNamed('/home');
+
+      setState(() {
+        _isLoading = false;
+      });
     } else {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => const responsiveLayout(
-              WebScreenLayout: WebScreenLayout(),
-              MobileScreenLayout: MobileScreenLayout()),
-        ),
-      );
+      setState(() {
+        _isLoading = false;
+      });
+      showSnackBar(res, context);
     }
-    setState(() {
-      _isLoading = false;
-      print(_isLoading);
-    });
   }
 
   void navigateToSignup() {
@@ -105,7 +112,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 onTap: loginUser,
                 child: Container(
                   child: _isLoading
-                      ? const Center(
+                      ? Center(
                           child: CircularProgressIndicator(),
                         )
                       : const Text("Log in"),

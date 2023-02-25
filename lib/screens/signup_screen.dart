@@ -59,13 +59,7 @@ class _SignupScreenState extends State<SignupScreen> {
     if (res != 'success') {
       showSnackBar(res, context);
     } else {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => const responsiveLayout(
-              WebScreenLayout: WebScreenLayout(),
-              MobileScreenLayout: MobileScreenLayout()),
-        ),
-      );
+      Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
     }
   }
 

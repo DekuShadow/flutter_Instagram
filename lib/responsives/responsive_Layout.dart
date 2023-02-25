@@ -1,8 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_instagram/models/user.dart';
 import 'package:flutter_instagram/providers/providers.dart';
+import 'package:flutter_instagram/resources/bloc/auth_current_uid_bloc.dart';
 import 'package:provider/provider.dart';
 import '../utils/utills.dart';
 

@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:flutter_instagram/utils/utills.dart';
 
 class FollowButton extends StatelessWidget {
   final Function()? function;
   final Color backgroundColor;
-  final Color borderColor;
   final String text;
   final Color textColor;
   const FollowButton(
       {super.key,
       this.function,
       required this.backgroundColor,
-      required this.borderColor,
       required this.text,
       required this.textColor});
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
     return Container(
       padding: const EdgeInsets.only(top: 3),
       child: TextButton(
@@ -25,7 +25,6 @@ class FollowButton extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             color: backgroundColor,
-            border: Border.all(color: borderColor),
             borderRadius: BorderRadius.circular(5),
           ),
           alignment: Alignment.center,
@@ -36,8 +35,8 @@ class FollowButton extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          width: 250,
-          height: 27,
+          width: width > webScreenSize ? width * 0.15 : width / 3.0,
+          height: 30,
         ),
       ),
     );

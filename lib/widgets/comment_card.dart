@@ -19,7 +19,7 @@ class CommentCard extends StatefulWidget {
 class _CommentCardState extends State<CommentCard> {
   @override
   Widget build(BuildContext context) {
-    final User user = Provider.of<UserProvider>(context).getUser;
+    // final User user = Provider.of<UserProvider>(context).getUser();
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),

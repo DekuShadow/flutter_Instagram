@@ -3,11 +3,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_instagram/providers/providers.dart';
+import 'package:flutter_instagram/resources/bloc/auth_current_uid_bloc.dart';
 import 'package:flutter_instagram/screens/screens.dart';
 import 'package:provider/provider.dart';
 // import 'firebase_options.dart';
 import 'responsives/responsives.dart';
+import 'screens/profile_screen/bloc/app_bar_bloc.dart';
 import 'utils/utills.dart';
 
 Future<void> main() async {
@@ -31,38 +34,48 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => UserProvider())],
-      child: MaterialApp(
-        title: 'Instagram',
-        theme: ThemeData.dark()
-            .copyWith(scaffoldBackgroundColor: mobileBackgroundColor),
-        // home: const responsiveLayout(
-        //     WebScreenLayout: WebScreenLayout(),
-        //     MobileScreenLayout: MobileScreenLayout()),
-        home: StreamBuilder(
-          stream: FirebaseAuth.instance.authStateChanges(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.active) {
-              if (snapshot.hasData) {
-                return const responsiveLayout(
-                    WebScreenLayout: WebScreenLayout(),
-                    MobileScreenLayout: MobileScreenLayout());
-              } else if (snapshot.hasError) {
-                return Container(
-                  child: Text(snapshot.hasError.toString()),
+    final authUid = BlocProvider<AuthCurrentUidBloc>(
+        create: (context) => AuthCurrentUidBloc());
+    final profile = BlocProvider(
+      create: (context) => AppBarBloc(),
+    );
+    return MultiBlocProvider(
+      providers: [authUid, profile],
+      child: MultiProvider(
+        providers: [ChangeNotifierProvider(create: (_) => UserProvider())],
+        child: MaterialApp(
+          routes: {
+            '/home': (context) => responsiveLayout(
+                WebScreenLayout: WebScreenLayout(),
+                MobileScreenLayout: MobileScreenLayout()),
+          },
+          title: 'Instagram',
+          theme: ThemeData.dark()
+              .copyWith(scaffoldBackgroundColor: mobileBackgroundColor),
+          home: StreamBuilder(
+            stream: FirebaseAuth.instance.authStateChanges(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.active) {
+                if (snapshot.hasData) {
+                  return const responsiveLayout(
+                      WebScreenLayout: WebScreenLayout(),
+                      MobileScreenLayout: MobileScreenLayout());
+                } else if (snapshot.hasError) {
+                  return Container(
+                    child: Text(snapshot.hasError.toString()),
+                  );
+                }
+              }
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(
+                  child: CircularProgressIndicator(
+                    color: primaryColor,
+                  ),
                 );
               }
-            }
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(
-                child: CircularProgressIndicator(
-                  color: primaryColor,
-                ),
-              );
-            }
-            return const LoginScreen();
-          },
+              return const LoginScreen();
+            },
+          ),
         ),
       ),
     );
