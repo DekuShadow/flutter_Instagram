@@ -7,13 +7,8 @@ abstract class AppBarEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class IndexcurrentEvent extends AppBarEvent {
-  final currentIndex;
-  IndexcurrentEvent(this.currentIndex);
-}
-
 class followerEvent extends AppBarEvent {
   final uid;
 
-  followerEvent(this.uid);
+  const followerEvent({this.uid});
 }

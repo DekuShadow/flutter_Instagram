@@ -9,24 +9,64 @@ class FirestoreMethods {
 
 // upload post
   Future<String> uploadPost(String description, Uint8List file, String uid,
-      String username, String profImage) async {
+      String username, String profImage, bool isVideo) async {
     String res = "some error occurred";
-    try {
-      String photoUrl =
+    String videoUrl = '';
+    String photoUrl = '';
+    if (isVideo) {
+      print("isVideo" + isVideo.toString());
+      videoUrl =
           await StorageMethods().uploadImageToStorage('posts', file, true);
+    } else {
+      photoUrl =
+          await StorageMethods().uploadImageToStorage('posts', file, true);
+    }
+    try {
       String postId = const Uuid().v1();
 
+      print("VideoUrllllllllllllllllllllllllll          " + videoUrl);
       Post post = Post(
           description: description,
           postId: postId,
           datePublished: DateTime.now(),
           postUrl: photoUrl,
+          postVideo: videoUrl,
           profImage: profImage,
           likes: [],
           uid: uid,
           username: username);
 
       _firestore.collection('posts').doc(postId).set(post.toJosn());
+
+      res = "success";
+    } catch (err) {
+      res = err.toString();
+    }
+    return res;
+  }
+
+  Future<String> uploadReels(String description, Uint8List file, String uid,
+      String username, String profImage, bool isVideo) async {
+    String res = "some error occurred";
+    String videoReels = '';
+
+    videoReels =
+        await StorageMethods().uploadImageToStorage('Reels', file, true);
+
+    try {
+      String postId = const Uuid().v1();
+
+      PostReels post = PostReels(
+          description: description,
+          postId: postId,
+          datePublished: DateTime.now(),
+          postReels: videoReels,
+          profImage: profImage,
+          likes: [],
+          uid: uid,
+          username: username);
+
+      _firestore.collection('Reels').doc(postId).set(post.toJosn());
 
       res = "success";
     } catch (err) {
@@ -70,6 +110,74 @@ class FirestoreMethods {
           'text': text,
           'commentId': commentId,
           'datePublished': DateTime.now(),
+        });
+      } else {
+        print("Text is empty");
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  Future<void> NewMessage({
+    required String form_avatar,
+    required String form_name,
+    required String form_uid,
+    required String last_msg,
+    required String last_time,
+    required String to_avatar,
+    required String to_name,
+    required String to_uid,
+    // required String chatId,
+  }) async {
+    try {
+      if (last_msg.isNotEmpty) {
+        // String messageId = const Uuid().v1();
+        String chatId = const Uuid().v1();
+        await _firestore
+            .collection('message')
+            .doc(chatId)
+            // .collection('msglist')
+            // .doc(messageId)
+            .set({
+          'form_avatar': form_avatar,
+          'form_name': form_name,
+          'form_uid': form_uid,
+          'last_msg': last_msg,
+          'last_time': DateTime.now(),
+          'to_avatar': to_avatar,
+          'to_name': to_name,
+          'to_uid': to_uid,
+          'chatId': chatId,
+        });
+      } else {
+        print("Text is empty");
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  Future<void> sendMessage({
+    required String addtime,
+    required String content,
+    required String type,
+    required String uid,
+    required String chatId,
+  }) async {
+    try {
+      if (content.isNotEmpty) {
+        String messageId = const Uuid().v1();
+        await _firestore
+            .collection('message')
+            .doc(chatId)
+            .collection('msglist')
+            .doc(messageId)
+            .set({
+          'addtime': addtime,
+          'content': content,
+          'type': type,
+          'uid': uid,
         });
       } else {
         print("Text is empty");

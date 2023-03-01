@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
@@ -49,14 +50,27 @@ class _ReelsScreenState extends State<ReelsScreen> {
             ),
           ),
         ),
-        body: PageView.builder(
-            scrollDirection: Axis.vertical,
-            itemCount: PhotoUrl().photoUrl.length,
-            itemBuilder: (context, index) {
-              return ReelsCard(
-                width: width,
-                index: index,
-              );
+        body: StreamBuilder(
+            stream: FirebaseFirestore.instance.collection("Reels").snapshots(),
+            builder: (context,
+                AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
+              return snapshot.connectionState == ConnectionState.waiting
+                  ? Container(
+                      child: Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    )
+                  : PageView.builder(
+                      scrollDirection: Axis.vertical,
+                      itemCount: snapshot.data!.docs.length,
+                      itemBuilder: (context, index) {
+                        // print(snapshot.data!.docs[0]['postReels'].toString());
+                        return ReelsCard(
+                          width: width,
+                          index: index,
+                          snap: snapshot.data!.docs[index].data(),
+                        );
+                      });
             }));
   }
 }

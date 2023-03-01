@@ -7,13 +7,9 @@ part 'app_bar_event.dart';
 part 'app_bar_state.dart';
 
 class AppBarBloc extends Bloc<AppBarEvent, AppBarState> {
-  AppBarBloc() : super(AppBarInitial(0)) {
-    on<IndexcurrentEvent>((event, emit) {
-      emit(AppBarInitial(event.currentIndex));
-    });
-
+  AppBarBloc() : super(AppBarInitial()) {
     on<followerEvent>((event, emit) async {
-      emit(LoadingDataState());
+      // emit(LoadingDataState());
       try {
         var userSnap = await FirebaseFirestore.instance
             .collection('users')
@@ -32,6 +28,13 @@ class AppBarBloc extends Bloc<AppBarEvent, AppBarState> {
         var isFollowing = userSnap
             .data()!['follower']
             .contains(FirebaseAuth.instance.currentUser!.uid);
+
+        emit(FollowerFinishState(
+            postLen: postLen,
+            followers: followers,
+            following: following,
+            isFollowing: isFollowing,
+            userData: userData));
       } catch (e) {
         // showSnackBar(e.toString(), context);
       }

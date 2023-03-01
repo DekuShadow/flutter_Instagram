@@ -9,8 +9,9 @@ class ReelsCard extends StatefulWidget {
     super.key,
     required this.width,
     required this.index,
+    required this.snap,
   });
-
+  final snap;
   final double width;
   final int index;
 
@@ -20,17 +21,17 @@ class ReelsCard extends StatefulWidget {
 
 class _ReelsCardState extends State<ReelsCard> {
   late VideoPlayerController _controller;
+  bool _isMuted = false;
 
   @override
   void initState() {
+    print("${widget.snap['postReels']}");
     super.initState();
-    _controller = VideoPlayerController.network(
-        'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4')
+    _controller = VideoPlayerController.network("${widget.snap['postReels']}")
       ..initialize().then((_) {
-        // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
         setState(() {});
       })
-      ..setVolume(50)
+      ..setVolume(100)
       ..play();
   }
 
@@ -56,17 +57,24 @@ class _ReelsCardState extends State<ReelsCard> {
                   ? _controller.pause()
                   : _controller.play();
             },
-            child: Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height,
-              decoration: BoxDecoration(
-                  // border: Border.all(color: Colors.white),
-                  ),
+            child: SizedBox(
+              width: double.infinity,
+              height: double.infinity,
               child: AspectRatio(
                 aspectRatio: _controller.value.aspectRatio,
-                child: _controller.value.isInitialized
-                    ? VideoPlayer(_controller)
-                    : Image.network(PhotoUrl().photoUrl[widget.index]),
+                child: Stack(
+                  children: [
+                    _controller.value.isInitialized
+                        ? VideoPlayer(
+                            _controller,
+                          )
+                        : Image.network(widget.snap['profImage']),
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: VideoProgress(controller: _controller),
+                    )
+                  ],
+                ),
               ),
             ),
           ),
@@ -89,7 +97,7 @@ class _ReelsCardState extends State<ReelsCard> {
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: Text("username"),
+                          child: Text(widget.snap['username']),
                         ),
                         Container(
                           alignment: Alignment.center,
@@ -109,7 +117,7 @@ class _ReelsCardState extends State<ReelsCard> {
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 6),
-                    child: Text("Caption hello word"),
+                    child: Text(widget.snap['description']),
                   ),
                   Container(
                     margin: EdgeInsets.symmetric(vertical: 6),
@@ -186,20 +194,60 @@ class _ReelsCardState extends State<ReelsCard> {
           ),
           Positioned(
               bottom: 400,
-              child: InkWell(
-                onTap: () {
-                  setState(() {
-                    _controller.value.isPlaying
-                        ? _controller.pause()
-                        : _controller.play();
-                    print("object");
-                  });
-                },
-                child: _controller.value.isPlaying
-                    ? Icon(Icons.pause)
-                    : Icon(Icons.play_arrow),
+              child: Column(
+                children: [
+                  InkWell(
+                    onTap: () {
+                      setState(() {
+                        _controller.value.isPlaying
+                            ? _controller.pause()
+                            : _controller.play();
+                        print("object");
+                      });
+                    },
+                    child: _controller.value.isPlaying
+                        ? Icon(Icons.pause)
+                        : Icon(Icons.play_arrow),
+                  ),
+                  InkWell(
+                    onTap: () {
+                      setState(() {
+                        _isMuted
+                            ? _controller.setVolume(100)
+                            : _controller.setVolume(0);
+                        print("object");
+                        _isMuted = _controller.value.volume == 0;
+                      });
+                    },
+                    child: _isMuted
+                        ? Icon(Icons.volume_off)
+                        : Icon(Icons.volume_up),
+                  ),
+                ],
               ))
         ],
+      ),
+    );
+  }
+}
+
+class VideoProgress extends StatelessWidget {
+  const VideoProgress({
+    super.key,
+    required this.controller,
+  });
+
+  final VideoPlayerController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return VideoProgressIndicator(
+      controller,
+      allowScrubbing: true,
+      padding: EdgeInsets.zero,
+      colors: VideoProgressColors(
+        backgroundColor: Colors.white,
+        playedColor: Colors.black,
       ),
     );
   }

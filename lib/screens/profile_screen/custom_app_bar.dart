@@ -3,11 +3,16 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'bloc/app_bar_bloc.dart';
+import 'bloc/app_bar/app_bar_bloc.dart';
 
 class CustomAppBar extends StatelessWidget {
-  int currentIndex;
-  CustomAppBar({super.key, required this.currentIndex});
+  final Function() function;
+  final currentIndex;
+  const CustomAppBar({
+    super.key,
+    required this.function,
+    required this.currentIndex,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -24,9 +29,7 @@ class CustomAppBar extends StatelessWidget {
               Icons.auto_awesome_mosaic_rounded,
               size: 30,
             ),
-            onPressed: () {
-              BlocProvider.of<AppBarBloc>(context).add(IndexcurrentEvent(0));
-            },
+            onPressed: () {},
           ),
           IconButton(
             color: currentIndex == 1 ? Colors.white : Colors.white38,
@@ -34,9 +37,7 @@ class CustomAppBar extends StatelessWidget {
               Icons.assignment_ind_outlined,
               size: 30,
             ),
-            onPressed: () {
-              BlocProvider.of<AppBarBloc>(context).add(IndexcurrentEvent(1));
-            },
+            onPressed: () {},
           ),
         ],
       ),

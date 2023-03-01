@@ -10,6 +10,7 @@ import 'package:flutter_instagram/utils/utills.dart';
 import 'package:flutter_instagram/widgets/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:video_player/video_player.dart';
 
 class PostCard extends StatefulWidget {
   final snap;
@@ -21,14 +22,25 @@ class PostCard extends StatefulWidget {
 
 class _PostCardState extends State<PostCard> {
   bool islikeAnimating = false;
-
   int commentLen = 0;
+  late VideoPlayerController _controller;
 
   @override
   void initState() {
-    // TODO: implement initState
+    _controller =
+        VideoPlayerController.network("${widget.snap['postVideo'].toString()}")
+          ..initialize().then((_) {
+            // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
+            setState(() {});
+          });
     super.initState();
     getComments();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controller.dispose();
   }
 
   void getComments() async {
@@ -118,23 +130,48 @@ class _PostCardState extends State<PostCard> {
           child: Stack(
             alignment: Alignment.center,
             children: [
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.35,
-                width: double.infinity,
-                child: Image.network(
-                  widget.snap['postUrl'],
-                  fit: BoxFit.cover,
-                ),
-              ),
+              widget.snap['postVideo'] != ''
+                  ? GestureDetector(
+                      onTap: () {
+                        print("video");
+                        _controller.value.isPlaying
+                            ? _controller.pause()
+                            : _controller.play();
+                      },
+                      child: SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.35,
+                        width: double.infinity,
+                        child: AspectRatio(
+                            aspectRatio: _controller.value.aspectRatio,
+                            child: /* _controller.value.isInitialized */
+                                VideoPlayer(_controller)
+                            // : Image.network(PhotoUrl().photoUrl[widget.index]),
+                            ),
+                      ),
+                    )
+                  : SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.35,
+                      width: double.infinity,
+                      child: Image.network(
+                        widget.snap['postUrl'],
+                        fit: BoxFit.cover,
+                      ),
+                    ),
               AnimatedOpacity(
                 opacity: islikeAnimating ? 1 : 0,
                 duration: const Duration(milliseconds: 200),
                 child: LikeAnimation(
-                  child: const Icon(
-                    Icons.favorite,
-                    color: Colors.red,
-                    size: 120,
-                  ),
+                  child: widget.snap['likes'].contains(user.uid)
+                      ? const Icon(
+                          Icons.favorite,
+                          color: Colors.red,
+                          size: 120,
+                        )
+                      : const Icon(
+                          Icons.favorite_border_outlined,
+                          // color: Colors.red,
+                          size: 120,
+                        ),
                   isAnimation: islikeAnimating,
                   duration: const Duration(milliseconds: 400),
                   onEnd: () {
